@@ -58,7 +58,12 @@ async function main() {
     
     const targetExtension = config['format'] ? String(config['format']) : undefined;
     
-    const opSuffix = subOperation ? subOperation.command : operation.command;
+    let opSuffix = subOperation ? subOperation.command : operation.command;
+    if (operation.command === 'convert' && config['theme']) {
+      const themeStr = String(config['theme']);
+      const themeName = require('node:path').parse(themeStr).name;
+      opSuffix = `${opSuffix}_${themeName}`;
+    }
     const destPath = generateSafeFilename(destDirAbsolute, imgName, opSuffix, targetExtension);
     
     const args = buildCommandArgs(operation, config, inputPath, destPath, subOperation?.command);
