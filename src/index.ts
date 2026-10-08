@@ -1,3 +1,4 @@
+#!/usr/bin/env bun
 import { join, relative } from 'node:path';
 import { printHeader, printCurrentDirectory, printDivider, printError, printSuccess } from './cli/display';
 import { selectImages, selectOperation, configureOperation, selectDestination } from './cli/prompts';

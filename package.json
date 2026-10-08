@@ -1,8 +1,11 @@
 {
-  "name": "gowall_cli",
+  "name": "gowall-cli",
+  "version": "1.0.0",
   "module": "src/index.ts",
   "type": "module",
-  "private": true,
+  "bin": {
+    "gowall-cli": "src/index.ts"
+  },
   "scripts": {
     "start": "bun run src/index.ts"
   },

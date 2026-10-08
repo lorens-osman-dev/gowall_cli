@@ -25,34 +25,27 @@ go install github.com/Achno/gowall@latest
 
 > **Note on Upscaling**: The `upscale` operation uses Enhanced Super-Resolution GAN and requires a GPU with **Vulkan support**. If your system does not support Vulkan, the upscaling process will fail.
 
-## Setup
+## Setup & Installation
 
-Clone this repository and install dependencies using Bun:
+Clone this repository and install it globally using Bun:
 
 ```bash
 git clone <repository_url> gowall-cli
 cd gowall-cli
 bun install
+bun link
 ```
+
+*Note: `bun link` registers the `gowall-cli` command globally on your system.*
 
 ## Usage
 
-You can run the interactive CLI from any directory containing your images. The CLI will automatically scan the current working directory for supported image formats (PNG, JPG, JPEG, WEBP).
+Once installed, you can simply type `gowall-cli` from any directory containing your images. The CLI will automatically scan your current working directory.
 
-1. Navigate to the directory containing your images:
-   ```bash
-   cd ~/Pictures
-   ```
-
-2. Run the CLI:
-   ```bash
-   bun run /path/to/gowall-cli/src/index.ts
-   ```
-   
-   Or if you are inside the `gowall-cli` project directory, simply run:
-   ```bash
-   bun run start
-   ```
+```bash
+cd ~/Pictures
+gowall-cli
+```
 
 ### Example Workflow
 
