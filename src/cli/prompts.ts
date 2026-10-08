@@ -76,8 +76,21 @@ export async function configureOperation(flags: FlagDefinition[], opName: string
     if (response.value === undefined) {
       process.exit(0);
     }
+    let responseValue = response.value;
     
-    config[flag.name] = response.value;
+    if (responseValue === '__CUSTOM__') {
+      const customResponse = await prompts({
+        type: 'text',
+        name: 'customValue',
+        message: `Enter custom path or value for ${flag.name}:`,
+      });
+      if (customResponse.customValue === undefined) {
+        process.exit(0);
+      }
+      responseValue = customResponse.customValue;
+    }
+    
+    config[flag.name] = responseValue;
   }
   
   return config;
