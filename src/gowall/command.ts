@@ -36,5 +36,9 @@ export function buildCommandArgs(
   // Always answer yes to prompts
   args.push('--yes');
   
+  // Disable gowall's auto-preview so we can handle opening logic in the CLI
+  args.push('--preview');
+  args.push('false');
+  
   return args;
 }

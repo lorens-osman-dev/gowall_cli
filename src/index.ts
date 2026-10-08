@@ -52,6 +52,8 @@ async function main() {
   let successCount = 0;
   let failCount = 0;
 
+  let lastSuccessPath = '';
+
   for (let i = 0; i < selectedImages.length; i++) {
     const imgName = selectedImages[i]!;
     const inputPath = join(cwd, imgName);
@@ -72,6 +74,7 @@ async function main() {
     
     if (result.success) {
       successCount++;
+      lastSuccessPath = destPath;
       const relativeDest = relative(cwd, destPath);
       printTaskSuccess(i + 1, selectedImages.length, imgName, relativeDest);
     } else {
@@ -88,6 +91,15 @@ async function main() {
 
   printDivider();
   printSummary(successCount, failCount, destDirAbsolute);
+
+  if (successCount > 0) {
+    const open = (await import('open')).default;
+    if (selectedImages.length === 1) {
+      await open(lastSuccessPath);
+    } else {
+      await open(destDirAbsolute);
+    }
+  }
 }
 
 main().catch(err => {
