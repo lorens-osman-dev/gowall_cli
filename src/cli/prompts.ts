@@ -65,11 +65,17 @@ export async function configureOperation(flags: FlagDefinition[], opName: string
     if (flag.type === 'boolean') type = 'toggle';
     if (flag.type === 'select') type = 'select';
     
+    let initialValue = flag.default;
+    if (type === 'select' && flag.choices) {
+      initialValue = flag.choices.findIndex(c => c.value === flag.default);
+      if (initialValue === -1) initialValue = 0;
+    }
+    
     const response = await prompts({
       type,
       name: 'value',
       message: flag.name.charAt(0).toUpperCase() + flag.name.slice(1),
-      initial: flag.default as any,
+      initial: initialValue as any,
       choices: flag.choices,
     });
     

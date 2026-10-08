@@ -15,10 +15,10 @@ export function buildCommandArgs(
     args.push(subCommandStr);
   }
   
-  args.push(inputFile);
-  
-  args.push('--output');
-  args.push(outputFile);
+  // Always answer yes to prompts and disable preview
+  args.push('--yes');
+  args.push('--preview');
+  args.push('false');
   
   // Use either sub-operation flags or main operation flags
   const flagsDefinition = subCommandStr && operation.subOperations 
@@ -33,12 +33,10 @@ export function buildCommandArgs(
     }
   }
   
-  // Always answer yes to prompts
-  args.push('--yes');
+  args.push(inputFile);
   
-  // Disable gowall's auto-preview so we can handle opening logic in the CLI
-  args.push('--preview');
-  args.push('false');
+  args.push('--output');
+  args.push(outputFile);
   
   return args;
 }
