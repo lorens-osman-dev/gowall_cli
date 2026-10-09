@@ -23,6 +23,7 @@ export const convert: Operation = {
       type: 'select',
       description: 'Theme name or path to JSON file containing theme',
       choices: [
+        { title: 'All', value: '__ALL__' },
         { title: 'Skip / No theme', value: '' },
         { title: 'catppuccin', value: 'catppuccin' },
         { title: 'nord', value: 'nord' },

@@ -14,12 +14,17 @@ export async function selectImages(cwd: string): Promise<string[]> {
     type: 'multiselect',
     name: 'selectedImages',
     message: 'Select image(s):',
-    choices: images.map(img => ({ title: img, value: img })),
+    choices: [
+      { title: 'All', value: '__ALL__' },
+      ...images.map(img => ({ title: img, value: img }))
+    ],
     min: 1,
     instructions: false
   });
 
-  return selectedImages || [];
+  if (!selectedImages) return [];
+  if (selectedImages.includes('__ALL__')) return images;
+  return selectedImages;
 }
 
 export async function selectOperation(): Promise<{ operation: Operation; subOperation?: SubOperation }> {

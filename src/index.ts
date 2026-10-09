@@ -48,28 +48,60 @@ async function main() {
   printDivider();
 
   // 6 & 8 & 9. Process Images
-  printProcessingStart(selectedImages.length);
+  let themesToProcess: (string | undefined)[] = [undefined];
+  if (operation.command === 'convert') {
+    if (config['theme'] === '__ALL__') {
+      const themeFlag = operation.flags?.find(f => f.name === 'theme');
+      if (themeFlag && themeFlag.choices) {
+        themesToProcess = themeFlag.choices
+          .map(c => String(c.value))
+          .filter(v => v !== '__ALL__' && v !== '' && v !== '__CUSTOM__');
+      }
+    } else {
+      themesToProcess = [config['theme'] ? String(config['theme']) : undefined];
+    }
+  }
+
+  interface Task {
+    imgName: string;
+    themeStr?: string;
+  }
+  const tasks: Task[] = [];
+  for (const img of selectedImages) {
+    for (const t of themesToProcess) {
+      tasks.push({ imgName: img, themeStr: t });
+    }
+  }
+
+  printProcessingStart(tasks.length);
   
   let successCount = 0;
   let failCount = 0;
 
   let lastSuccessPath = '';
 
-  for (let i = 0; i < selectedImages.length; i++) {
-    const imgName = selectedImages[i]!;
+  for (let i = 0; i < tasks.length; i++) {
+    const task = tasks[i]!;
+    const imgName = task.imgName;
     const inputPath = join(cwd, imgName);
     
     const targetExtension = config['format'] ? String(config['format']) : undefined;
     
     let opSuffix = subOperation ? subOperation.command : operation.command;
-    if (operation.command === 'convert' && config['theme']) {
-      const themeStr = String(config['theme']);
-      const themeName = require('node:path').parse(themeStr).name;
+    if (operation.command === 'convert' && task.themeStr) {
+      const themeName = require('node:path').parse(task.themeStr).name;
       opSuffix = `${opSuffix}_${themeName}`;
     }
     const destPath = generateSafeFilename(destDirAbsolute, imgName, opSuffix, targetExtension);
     
-    const args = buildCommandArgs(operation, config, inputPath, destPath, subOperation?.command);
+    const taskConfig = { ...config };
+    if (task.themeStr !== undefined) {
+      taskConfig['theme'] = task.themeStr;
+    } else if (taskConfig['theme'] === '__ALL__') {
+      delete taskConfig['theme'];
+    }
+
+    const args = buildCommandArgs(operation, taskConfig, inputPath, destPath, subOperation?.command);
     
     const result = await executeGowall(args);
     
@@ -77,7 +109,7 @@ async function main() {
       successCount++;
       lastSuccessPath = destPath;
       const relativeDest = relative(cwd, destPath);
-      printTaskSuccess(i + 1, selectedImages.length, imgName, relativeDest);
+      printTaskSuccess(i + 1, tasks.length, imgName, relativeDest);
     } else {
       failCount++;
       
@@ -86,7 +118,7 @@ async function main() {
         errorMessage = 'Gowall reported that Vulkan/GPU support is unavailable.';
       }
       
-      printTaskFailure(i + 1, selectedImages.length, imgName, errorMessage, result.stderr);
+      printTaskFailure(i + 1, tasks.length, imgName, errorMessage, result.stderr);
     }
   }
 
@@ -95,7 +127,7 @@ async function main() {
 
   if (successCount > 0) {
     const open = (await import('open')).default;
-    if (selectedImages.length === 1) {
+    if (tasks.length === 1) {
       await open(lastSuccessPath);
     } else {
       await open(destDirAbsolute);
